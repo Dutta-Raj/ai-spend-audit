@@ -2,52 +2,98 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Color Scheme: Green Text + Grey Structure */
 body {
-  background-color: #f9fafb;
+  background: linear-gradient(135deg, #0f0c29 0%, #1a1a3e 50%, #24243e 100%);
   min-height: 100vh;
 }
 
-/* Green accent for text */
-.text-green-custom {
-  color: #059669;
+/* ALL TEXT FULLY VISIBLE */
+.text-white, .text-white * {
+  color: #ffffff !important;
 }
 
-/* Grey backgrounds for structural rows */
-.bg-grey-structure {
-  background-color: #f9fafb;
+.text-slate-300 {
+  color: #cbd5e1 !important;
 }
 
-/* Custom Scrollbar - Grey */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: #e5e7eb;
-  border-radius: 10px;
-}
-::-webkit-scrollbar-thumb {
-  background: #9ca3af;
-  border-radius: 10px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #6b7280;
+.text-slate-400 {
+  color: #94a3b8 !important;
 }
 
-/* Selection - Green */
-::selection {
-  background: #059669;
-  color: white;
+.text-emerald-400 {
+  color: #34d399 !important;
 }
 
-/* Focus Rings - Green */
-input:focus, select:focus, textarea:focus {
-  outline: none;
-  ring-color: #059669;
+/* Headers fully visible */
+h1, h2, h3, h4 {
+  color: white !important;
 }
 
-/* Smooth Transitions */
-button, input, select {
-  transition: all 0.2s ease;
+/* Labels visible */
+label {
+  color: #a5b4fc !important;
+  font-weight: 500 !important;
+}
+
+/* Input fields */
+input, select, textarea {
+  color: #ffffff !important;
+  background-color: #1e293b !important;
+  border: 1px solid #475569 !important;
+  border-radius: 12px !important;
+  padding: 10px 16px !important;
+}
+
+input:focus, select:focus {
+  border-color: #10b981 !important;
+  outline: none !important;
+}
+
+input::placeholder {
+  color: #64748b !important;
+}
+
+select option {
+  background-color: #1e293b !important;
+  color: #ffffff !important;
+}
+
+/* Button text */
+button {
+  color: white !important;
+}
+
+/* Fix header visibility - ensure no overflow */
+.overflow-hidden {
+  overflow: visible !important;
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* Ensure all text has proper contrast */
+p, span, div {
+  color: inherit;
+}
+/* Button visibility fixes */
+button {
+  font-weight: 600 !important;
+  cursor: pointer !important;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+.bg-emerald-500, .bg-emerald-600 {
+  background-color: #10b981 !important;
+}
+
+.bg-slate-600, .bg-slate-700 {
+  background-color: #475569 !important;
+}
+
+.shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
 }
