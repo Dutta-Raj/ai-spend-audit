@@ -27,16 +27,19 @@ type Recommendation = {
   action: string;
 };
 
+// Default tools configuration
+const DEFAULT_TOOLS: Tool[] = [
+  { id: "cursor", name: "Cursor", plan: "Pro", seats: 2, spend: 40 },
+  { id: "copilot", name: "GitHub Copilot", plan: "Individual", seats: 2, spend: 20 },
+  { id: "claude", name: "Claude", plan: "Free", seats: 2, spend: 0 },
+  { id: "chatgpt", name: "ChatGPT", plan: "Free", seats: 2, spend: 0 },
+];
+
 export default function Home() {
-  const [tools, setTools] = useState<Tool[]>([
-    { id: "cursor", name: "Cursor", plan: "Pro", seats: 2, spend: 40 },
-    { id: "copilot", name: "GitHub Copilot", plan: "Individual", seats: 2, spend: 20 },
-    { id: "claude", name: "Claude", plan: "Free", seats: 2, spend: 0 },
-    { id: "chatgpt", name: "ChatGPT", plan: "Free", seats: 2, spend: 0 },
-  ]);
+  const [tools, setTools] = useState<Tool[]>(DEFAULT_TOOLS);
   
   const [teamSize, setTeamSize] = useState(5);
-  const [useCase, setUseCase] = useState("writing");
+  const [useCase, setUseCase] = useState("coding");
   const [companyName, setCompanyName] = useState("");
   const [companyDomain, setCompanyDomain] = useState("");
   const [email, setEmail] = useState("");
@@ -52,20 +55,22 @@ export default function Home() {
   const [shareId, setShareId] = useState("");
   const [showShareUrl, setShowShareUrl] = useState(false);
 
+  // Load from localStorage on mount
   useEffect(() => {
     const saved = localStorage.getItem("auditForm");
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        setTools(parsed.tools || tools);
+        setTools(parsed.tools || DEFAULT_TOOLS);
         setTeamSize(parsed.teamSize || 5);
-        setUseCase(parsed.useCase || "writing");
+        setUseCase(parsed.useCase || "coding");
         setCompanyName(parsed.companyName || "");
         setCompanyDomain(parsed.companyDomain || "");
       } catch (e) {}
     }
   }, []);
 
+  // Save to localStorage
   useEffect(() => {
     localStorage.setItem("auditForm", JSON.stringify({ tools, teamSize, useCase, companyName, companyDomain }));
   }, [tools, teamSize, useCase, companyName, companyDomain]);
@@ -134,6 +139,7 @@ export default function Home() {
   };
 
   const resetAudit = () => {
+    // Reset all state to defaults
     setIsAudited(false);
     setRecommendations([]);
     setTotalSavings(0);
@@ -142,6 +148,16 @@ export default function Home() {
     setEmail("");
     setCopied(false);
     setShowShareUrl(false);
+    
+    // Reset form to default values
+    setTools(DEFAULT_TOOLS);
+    setTeamSize(5);
+    setUseCase("coding");
+    setCompanyName("");
+    setCompanyDomain("");
+    
+    // Clear localStorage
+    localStorage.removeItem("auditForm");
   };
 
   const handleShare = async () => {
@@ -186,7 +202,7 @@ export default function Home() {
         {!isAudited ? (
           <div className="bg-slate-800/60 rounded-xl border border-slate-700 overflow-hidden">
             
-            {/* Company Profile - WITH TEAM SIZE */}
+            {/* Company Profile */}
             <div className="p-4 border-b border-slate-700">
               <div className="flex items-center gap-2 mb-3">
                 <Building className="w-4 h-4 text-emerald-400" />
@@ -398,7 +414,7 @@ export default function Home() {
               </div>
             )}
 
-            {/* Email Capture for High Savings */}
+            {/* Email Capture */}
             {showEmailCapture && !emailCaptured && (
               <div className="bg-emerald-500/20 rounded-lg p-4 text-center border border-emerald-500/30">
                 <div className="flex flex-col sm:flex-row gap-3 items-center">
@@ -430,7 +446,7 @@ export default function Home() {
               </div>
             )}
 
-            {/* Credex Consultation for >$500 Savings */}
+            {/* Credex Consultation */}
             {totalSavings > 500 && (
               <div className="bg-purple-600/20 rounded-xl border border-purple-500/30 p-4 text-center">
                 <h3 className="text-white font-semibold text-sm mb-1">💎 Unlock Enterprise Pricing</h3>
