@@ -30,13 +30,13 @@ type Recommendation = {
 export default function Home() {
   const [tools, setTools] = useState<Tool[]>([
     { id: "cursor", name: "Cursor", plan: "Hobby", seats: 2, spend: 80 },
-    { id: "copilot", name: "GitHub Copilot", plan: "Business", seats: 2, spend: 38 },
+    { id: "copilot", name: "GitHub Copilot", plan: "Business", seats: 1, spend: 19 },
     { id: "claude", name: "Claude", plan: "Team", seats: 2, spend: 60 },
     { id: "chatgpt", name: "ChatGPT", plan: "Team", seats: 2, spend: 60 },
   ]);
   
   const [teamSize, setTeamSize] = useState(5);
-  const [useCase, setUseCase] = useState("writing");
+  const [useCase, setUseCase] = useState("coding");
   const [companyName, setCompanyName] = useState("");
   const [email, setEmail] = useState("");
   
@@ -49,6 +49,7 @@ export default function Home() {
   const [emailCaptured, setEmailCaptured] = useState(false);
   const [copied, setCopied] = useState(false);
   const [shareId, setShareId] = useState("");
+  const [showShareUrl, setShowShareUrl] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem("auditForm");
@@ -57,7 +58,7 @@ export default function Home() {
         const parsed = JSON.parse(saved);
         setTools(parsed.tools || tools);
         setTeamSize(parsed.teamSize || 5);
-        setUseCase(parsed.useCase || "writing");
+        setUseCase(parsed.useCase || "coding");
         setCompanyName(parsed.companyName || "");
       } catch (e) {}
     }
@@ -138,24 +139,35 @@ export default function Home() {
     setEmailCaptured(false);
     setEmail("");
     setCopied(false);
+    setShowShareUrl(false);
   };
 
   const handleShare = async () => {
     const url = `${window.location.origin}/audit/${shareId}`;
-    await navigator.clipboard.writeText(url);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setShowShareUrl(true);
+      // Hide the URL display after 5 seconds
+      setTimeout(() => {
+        setShowShareUrl(false);
+        setCopied(false);
+      }, 5000);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+      alert(`Copy this URL to share:\n\n${url}`);
+    }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <div className="max-w-4xl mx-auto px-4 py-8">
         
-        {/* Header - Fully Visible */}
+        {/* Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 bg-emerald-500/20 px-4 py-2 rounded-full mb-4">
             <Sparkles className="w-4 h-4 text-emerald-400" />
-            <span className="text-base text-emerald-400 font-medium">Free AI Spend Audit — No Credit Card Required</span>
+            <span className="text-sm text-emerald-400 font-medium">Free AI Spend Audit — No Credit Card Required</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
             AI Spend<span className="text-emerald-400">Audit</span>
@@ -269,7 +281,7 @@ export default function Home() {
               </button>
             </div>
 
-            {/* Run Audit Button - VISIBLE NOW */}
+            {/* Run Audit Button */}
             <div className="p-4 pt-0">
               <button
                 onClick={runAudit}
@@ -299,12 +311,14 @@ export default function Home() {
           </div>
         ) : (
           <div className="space-y-4">
+            {/* Savings Card */}
             <div className="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-xl p-6 text-center">
               <div className="text-emerald-100 text-xs mb-1">MONTHLY SAVINGS</div>
               <div className="text-4xl font-bold text-white mb-1">${totalSavings}</div>
               <p className="text-emerald-100 text-base">${annualSavings} per year</p>
             </div>
 
+            {/* Recommendations */}
             {recommendations.length > 0 && (
               <div className="bg-slate-800/60 rounded-xl border border-slate-700 p-4">
                 <h3 className="text-white font-semibold text-base mb-3 flex items-center gap-2">
@@ -334,11 +348,54 @@ export default function Home() {
               </div>
             )}
 
+            {/* Share URL Display */}
+            {showShareUrl && shareId && (
+              <div className="bg-emerald-500/20 rounded-lg p-3 text-center border border-emerald-500/30">
+                <p className="text-emerald-400 text-xs mb-1">✓ Shareable URL copied to clipboard!</p>
+                <p className="text-slate-300 text-xs break-all">
+                  {window.location.origin}/audit/{shareId}
+                </p>
+              </div>
+            )}
+
+            {/* Email Capture */}
+            {showEmailCapture && !emailCaptured && (
+              <div className="bg-emerald-500/10 rounded-xl border border-emerald-500/30 p-4">
+                <div className="flex flex-col sm:flex-row gap-3 items-center">
+                  <Mail className="w-5 h-5 text-emerald-400" />
+                  <div className="flex-1 text-center sm:text-left">
+                    <h3 className="font-semibold text-white text-sm">Save ${totalSavings}/month</h3>
+                    <p className="text-slate-400 text-xs">Get full report and exclusive offers</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="your@email.com"
+                      className="px-3 py-1.5 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm w-40"
+                    />
+                    <button onClick={captureEmail} className="bg-emerald-600 hover:bg-emerald-500 px-4 py-1.5 rounded-lg text-white text-sm font-medium">
+                      Send
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {emailCaptured && (
+              <div className="bg-emerald-500/10 rounded-xl border border-emerald-500/30 p-3 text-center">
+                <CheckCircle className="w-4 h-4 text-emerald-400 mx-auto mb-1" />
+                <p className="text-white text-xs">✓ Report sent to {email}</p>
+              </div>
+            )}
+
+            {/* Action Buttons */}
             <div className="flex gap-3">
-              <button onClick={resetAudit} className="flex-1 bg-slate-600 hover:bg-slate-500 border border-slate-500 text-white py-2 rounded-lg text-base font-medium flex items-center justify-center gap-1">
+              <button onClick={resetAudit} className="flex-1 bg-slate-700 hover:bg-slate-600 text-white py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-1">
                 <RefreshCw className="w-3.5 h-3.5" /> New Audit
               </button>
-              <button onClick={handleShare} className="flex-1 bg-emerald-500 hover:bg-emerald-400 shadow-lg shadow-emerald-500/30 text-white py-2 rounded-lg text-base font-medium flex items-center justify-center gap-1">
+              <button onClick={handleShare} className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-1">
                 {copied ? <Check className="w-3.5 h-3.5" /> : <Share2 className="w-3.5 h-3.5" />}
                 {copied ? "Copied!" : "Share"}
               </button>
@@ -349,4 +406,3 @@ export default function Home() {
     </div>
   );
 }
-
