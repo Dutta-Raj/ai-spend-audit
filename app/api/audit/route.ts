@@ -12,9 +12,9 @@ export async function POST(request: Request) {
   
   try {
     const body = await request.json();
-    const { tools, teamSize, useCase, companyName, email } = body;
+    const { tools, teamSize, useCase, companyName, companyDomain, email } = body;
     
-    console.log("📊 Processing", tools?.length, "tools");
+    console.log("📊 Processing tools:", tools?.length);
     
     const recommendations = [];
     let totalSavings = 0;
@@ -22,34 +22,43 @@ export async function POST(request: Request) {
 
     for (const tool of tools) {
       const toolPricing = PRICING[tool.id as keyof typeof PRICING];
-      if (!toolPricing) continue;
+      if (!toolPricing) {
+        console.log(`No pricing for: ${tool.id}`);
+        continue;
+      }
 
       let savings = 0;
       let recommendedPlan = tool.plan;
       let reason = "";
       let action = "";
 
-      // Cursor Business -> Pro
+      const currentPrice = toolPricing[tool.plan as keyof typeof toolPricing];
+      
+      console.log(`Processing ${tool.name}: plan=${tool.plan}, seats=${tool.seats}, spend=${tool.spend}, currentPrice=${currentPrice}`);
+
+      // RULE 1: Cursor Business -> Pro (save $20 per seat)
       if (tool.id === "cursor" && tool.plan === "Business") {
         const proPrice = toolPricing.Pro;
         const betterSpend = proPrice * tool.seats;
         if (betterSpend < tool.spend) {
           savings = tool.spend - betterSpend;
           recommendedPlan = "Pro";
-          reason = `Cursor Business costs $40/user but Pro is $20/user.`;
-          action = `Switch from Business to Pro (save $${savings}/month)`;
+          reason = `Cursor Business costs $40/user but Pro is $20/user. You're paying $${tool.spend} but could pay $${betterSpend}.`;
+          action = `Switch from Business to Pro plan (save $${savings}/month)`;
         }
       }
       
-      // Cursor Hobby overpaying
-      else if (tool.id === "cursor" && tool.plan === "Hobby" && tool.spend > 0) {
-        savings = tool.spend;
-        recommendedPlan = "Hobby (Free)";
-        reason = `Cursor Hobby plan is completely free. You're paying $${tool.spend} for something that costs $0.`;
-        action = `Cancel your payment and use the free Hobby plan`;
+      // RULE 2: Cursor Pro is optimal if spending correctly
+      else if (tool.id === "cursor" && tool.plan === "Pro") {
+        const expectedSpend = currentPrice * tool.seats;
+        if (tool.spend !== expectedSpend) {
+          savings = Math.abs(tool.spend - expectedSpend);
+          reason = `Pro plan costs $${currentPrice}/user. For ${tool.seats} users, you should pay $${expectedSpend}.`;
+          action = `Adjust your billing to $${expectedSpend}/month`;
+        }
       }
       
-      // Claude Team (2-3 seats) -> Pro
+      // RULE 3: Claude Team (small team) -> Pro
       else if (tool.id === "claude" && tool.plan === "Team" && tool.seats <= 3) {
         const proPrice = toolPricing.Pro;
         const betterSpend = proPrice * tool.seats;
@@ -61,7 +70,7 @@ export async function POST(request: Request) {
         }
       }
       
-      // Copilot Business (1 seat) -> Individual
+      // RULE 4: Copilot Business (1 seat) -> Individual
       else if (tool.id === "copilot" && tool.plan === "Business" && tool.seats === 1) {
         const individualPrice = toolPricing.Individual;
         if (individualPrice < tool.spend) {
@@ -72,14 +81,14 @@ export async function POST(request: Request) {
         }
       }
       
-      // ChatGPT Team (2 seats) -> Plus
+      // RULE 5: ChatGPT Team (2 seats) -> Plus
       else if (tool.id === "chatgpt" && tool.plan === "Team" && tool.seats === 2) {
         const plusPrice = toolPricing.Plus;
         const betterSpend = plusPrice * tool.seats;
         if (betterSpend < tool.spend) {
           savings = tool.spend - betterSpend;
           recommendedPlan = "Plus (two accounts)";
-          reason = `Two Plus accounts cost $40/month vs Team at $60/month.`;
+          reason = `Two Plus accounts cost $40/month vs Team at $60/month for same features.`;
           action = `Switch from Team to two Plus accounts (save $${savings}/month)`;
         }
       }
