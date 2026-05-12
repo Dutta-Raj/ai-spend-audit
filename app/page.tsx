@@ -29,14 +29,14 @@ type Recommendation = {
 
 export default function Home() {
   const [tools, setTools] = useState<Tool[]>([
-    { id: "cursor", name: "Cursor", plan: "Hobby", seats: 2, spend: 80 },
-    { id: "copilot", name: "GitHub Copilot", plan: "Business", seats: 1, spend: 19 },
-    { id: "claude", name: "Claude", plan: "Team", seats: 2, spend: 60 },
-    { id: "chatgpt", name: "ChatGPT", plan: "Team", seats: 2, spend: 60 },
+    { id: "cursor", name: "Cursor", plan: "Pro", seats: 2, spend: 40 },
+    { id: "copilot", name: "GitHub Copilot", plan: "Individual", seats: 2, spend: 20 },
+    { id: "claude", name: "Claude", plan: "Free", seats: 2, spend: 0 },
+    { id: "chatgpt", name: "ChatGPT", plan: "Free", seats: 2, spend: 0 },
   ]);
   
   const [teamSize, setTeamSize] = useState(5);
-  const [useCase, setUseCase] = useState("coding");
+  const [useCase, setUseCase] = useState("writing");
   const [companyName, setCompanyName] = useState("");
   const [companyDomain, setCompanyDomain] = useState("");
   const [email, setEmail] = useState("");
@@ -59,7 +59,7 @@ export default function Home() {
         const parsed = JSON.parse(saved);
         setTools(parsed.tools || tools);
         setTeamSize(parsed.teamSize || 5);
-        setUseCase(parsed.useCase || "coding");
+        setUseCase(parsed.useCase || "writing");
         setCompanyName(parsed.companyName || "");
         setCompanyDomain(parsed.companyDomain || "");
       } catch (e) {}
@@ -186,13 +186,13 @@ export default function Home() {
         {!isAudited ? (
           <div className="bg-slate-800/60 rounded-xl border border-slate-700 overflow-hidden">
             
-            {/* Company Profile - Added Domain Field */}
+            {/* Company Profile - WITH TEAM SIZE */}
             <div className="p-4 border-b border-slate-700">
               <div className="flex items-center gap-2 mb-3">
                 <Building className="w-4 h-4 text-emerald-400" />
                 <h2 className="text-white font-semibold text-base">Company Profile</h2>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                 <div>
                   <label className="block text-slate-400 text-xs mb-1">Company Name</label>
                   <input
@@ -204,7 +204,16 @@ export default function Home() {
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-400 text-xs mb-1">Company Domain (Website)</label>
+                  <label className="block text-slate-400 text-xs mb-1">Team Size</label>
+                  <input
+                    type="number"
+                    value={teamSize}
+                    onChange={(e) => setTeamSize(parseInt(e.target.value) || 1)}
+                    className="w-full px-3 py-2 bg-slate-900 border border-slate-600 rounded-lg text-white text-base"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-400 text-xs mb-1">Company Domain</label>
                   <input
                     type="text"
                     value={companyDomain}
@@ -322,7 +331,7 @@ export default function Home() {
           </div>
         ) : (
           <div className="space-y-4">
-            {/* Company Info Card - NEW */}
+            {/* Company Info Card */}
             <div className="bg-slate-800/60 rounded-xl border border-slate-700 p-4">
               <div className="flex items-center gap-2 mb-2">
                 <Briefcase className="w-4 h-4 text-emerald-400" />
@@ -335,16 +344,16 @@ export default function Home() {
                     <span className="text-white ml-2">{companyName}</span>
                   </div>
                 )}
+                <div>
+                  <span className="text-slate-500">Team Size:</span>
+                  <span className="text-white ml-2">{teamSize}</span>
+                </div>
                 {companyDomain && (
                   <div>
                     <span className="text-slate-500">Domain:</span>
                     <span className="text-emerald-400 ml-2">{companyDomain}</span>
                   </div>
                 )}
-                <div>
-                  <span className="text-slate-500">Team Size:</span>
-                  <span className="text-white ml-2">{teamSize}</span>
-                </div>
                 <div>
                   <span className="text-slate-500">Use Case:</span>
                   <span className="text-white ml-2">{useCase}</span>
@@ -386,6 +395,49 @@ export default function Home() {
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+
+            {/* Email Capture for High Savings */}
+            {showEmailCapture && !emailCaptured && (
+              <div className="bg-emerald-500/20 rounded-lg p-4 text-center border border-emerald-500/30">
+                <div className="flex flex-col sm:flex-row gap-3 items-center">
+                  <Mail className="w-5 h-5 text-emerald-400" />
+                  <div className="flex-1 text-center sm:text-left">
+                    <h3 className="font-semibold text-white text-sm">Save ${totalSavings}/month</h3>
+                    <p className="text-slate-400 text-xs">Get full report and exclusive offers</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="your@email.com"
+                      className="px-3 py-1.5 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm w-40"
+                    />
+                    <button onClick={captureEmail} className="bg-emerald-600 hover:bg-emerald-500 px-4 py-1.5 rounded-lg text-white text-sm font-medium">
+                      Send
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {emailCaptured && (
+              <div className="bg-emerald-500/20 rounded-lg p-3 text-center border border-emerald-500/30">
+                <CheckCircle className="w-4 h-4 text-emerald-400 mx-auto mb-1" />
+                <p className="text-white text-xs">✓ Report sent to {email}</p>
+              </div>
+            )}
+
+            {/* Credex Consultation for >$500 Savings */}
+            {totalSavings > 500 && (
+              <div className="bg-purple-600/20 rounded-xl border border-purple-500/30 p-4 text-center">
+                <h3 className="text-white font-semibold text-sm mb-1">💎 Unlock Enterprise Pricing</h3>
+                <p className="text-slate-300 text-xs mb-2">Credex offers discounted AI credits. Book a free consultation.</p>
+                <button className="bg-purple-600 hover:bg-purple-500 px-4 py-1.5 rounded-lg text-white text-xs font-medium">
+                  Book Consultation →
+                </button>
               </div>
             )}
 
