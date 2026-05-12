@@ -16,3 +16,8 @@ export function getAudit(shareId: string) {
   const stmt = db.prepare('SELECT * FROM audits WHERE share_id = ?');
   return stmt.get(shareId);
 }
+
+export function getAudit(shareId: string) {
+  const stmt = db.prepare('SELECT * FROM audits WHERE share_id = ?');
+  return stmt.get(shareId);
+}
