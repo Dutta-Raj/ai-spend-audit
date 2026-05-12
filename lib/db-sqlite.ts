@@ -11,3 +11,8 @@ export function saveAudit(data: any) {
   console.log("Audit saved (mock):", data.shareId);
   return data.shareId;
 }
+
+export function getAudit(shareId: string) {
+  const stmt = db.prepare('SELECT * FROM audits WHERE share_id = ?');
+  return stmt.get(shareId);
+}
