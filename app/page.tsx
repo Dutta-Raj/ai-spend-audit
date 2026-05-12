@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { 
   Sparkles, TrendingDown, Users, Plus, Trash2, CheckCircle, 
   Mail, Building, Cpu, Zap, Shield, Award, Copy, Check, ArrowRight,
-  RefreshCw, Share2
+  RefreshCw, Share2, Globe, Briefcase
 } from "lucide-react";
 
 type Tool = {
@@ -38,6 +38,7 @@ export default function Home() {
   const [teamSize, setTeamSize] = useState(5);
   const [useCase, setUseCase] = useState("coding");
   const [companyName, setCompanyName] = useState("");
+  const [companyDomain, setCompanyDomain] = useState("");
   const [email, setEmail] = useState("");
   
   const [isAudited, setIsAudited] = useState(false);
@@ -60,13 +61,14 @@ export default function Home() {
         setTeamSize(parsed.teamSize || 5);
         setUseCase(parsed.useCase || "coding");
         setCompanyName(parsed.companyName || "");
+        setCompanyDomain(parsed.companyDomain || "");
       } catch (e) {}
     }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("auditForm", JSON.stringify({ tools, teamSize, useCase, companyName }));
-  }, [tools, teamSize, useCase, companyName]);
+    localStorage.setItem("auditForm", JSON.stringify({ tools, teamSize, useCase, companyName, companyDomain }));
+  }, [tools, teamSize, useCase, companyName, companyDomain]);
 
   const updateTool = (id: string, field: string, value: any) => {
     setTools(prev => prev.map(t => t.id === id ? { ...t, [field]: value } : t));
@@ -105,7 +107,7 @@ export default function Home() {
     const response = await fetch("/api/audit", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ tools, teamSize, useCase, companyName, email }),
+      body: JSON.stringify({ tools, teamSize, useCase, companyName, companyDomain, email }),
     });
     
     const data = await response.json();
@@ -148,7 +150,6 @@ export default function Home() {
       await navigator.clipboard.writeText(url);
       setCopied(true);
       setShowShareUrl(true);
-      // Hide the URL display after 5 seconds
       setTimeout(() => {
         setShowShareUrl(false);
         setCopied(false);
@@ -185,20 +186,30 @@ export default function Home() {
         {!isAudited ? (
           <div className="bg-slate-800/60 rounded-xl border border-slate-700 overflow-hidden">
             
-            {/* Company Profile */}
+            {/* Company Profile - Added Domain Field */}
             <div className="p-4 border-b border-slate-700">
               <div className="flex items-center gap-2 mb-3">
                 <Building className="w-4 h-4 text-emerald-400" />
                 <h2 className="text-white font-semibold text-base">Company Profile</h2>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div>
                   <label className="block text-slate-400 text-xs mb-1">Company Name</label>
                   <input
                     type="text"
                     value={companyName}
                     onChange={(e) => setCompanyName(e.target.value)}
-                    placeholder="Enter company name"
+                    placeholder="e.g., Acme Inc"
+                    className="w-full px-3 py-2 bg-slate-900 border border-slate-600 rounded-lg text-white text-base"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-400 text-xs mb-1">Company Domain (Website)</label>
+                  <input
+                    type="text"
+                    value={companyDomain}
+                    onChange={(e) => setCompanyDomain(e.target.value)}
+                    placeholder="e.g., acme.com"
                     className="w-full px-3 py-2 bg-slate-900 border border-slate-600 rounded-lg text-white text-base"
                   />
                 </div>
@@ -311,6 +322,36 @@ export default function Home() {
           </div>
         ) : (
           <div className="space-y-4">
+            {/* Company Info Card - NEW */}
+            <div className="bg-slate-800/60 rounded-xl border border-slate-700 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Briefcase className="w-4 h-4 text-emerald-400" />
+                <h3 className="text-white font-semibold text-sm">Company Information</h3>
+              </div>
+              <div className="flex flex-wrap gap-4 text-sm">
+                {companyName && (
+                  <div>
+                    <span className="text-slate-500">Name:</span>
+                    <span className="text-white ml-2">{companyName}</span>
+                  </div>
+                )}
+                {companyDomain && (
+                  <div>
+                    <span className="text-slate-500">Domain:</span>
+                    <span className="text-emerald-400 ml-2">{companyDomain}</span>
+                  </div>
+                )}
+                <div>
+                  <span className="text-slate-500">Team Size:</span>
+                  <span className="text-white ml-2">{teamSize}</span>
+                </div>
+                <div>
+                  <span className="text-slate-500">Use Case:</span>
+                  <span className="text-white ml-2">{useCase}</span>
+                </div>
+              </div>
+            </div>
+
             {/* Savings Card */}
             <div className="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-xl p-6 text-center">
               <div className="text-emerald-100 text-xs mb-1">MONTHLY SAVINGS</div>
@@ -355,38 +396,6 @@ export default function Home() {
                 <p className="text-slate-300 text-xs break-all">
                   {window.location.origin}/audit/{shareId}
                 </p>
-              </div>
-            )}
-
-            {/* Email Capture */}
-            {showEmailCapture && !emailCaptured && (
-              <div className="bg-emerald-500/10 rounded-xl border border-emerald-500/30 p-4">
-                <div className="flex flex-col sm:flex-row gap-3 items-center">
-                  <Mail className="w-5 h-5 text-emerald-400" />
-                  <div className="flex-1 text-center sm:text-left">
-                    <h3 className="font-semibold text-white text-sm">Save ${totalSavings}/month</h3>
-                    <p className="text-slate-400 text-xs">Get full report and exclusive offers</p>
-                  </div>
-                  <div className="flex gap-2">
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="your@email.com"
-                      className="px-3 py-1.5 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm w-40"
-                    />
-                    <button onClick={captureEmail} className="bg-emerald-600 hover:bg-emerald-500 px-4 py-1.5 rounded-lg text-white text-sm font-medium">
-                      Send
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {emailCaptured && (
-              <div className="bg-emerald-500/10 rounded-xl border border-emerald-500/30 p-3 text-center">
-                <CheckCircle className="w-4 h-4 text-emerald-400 mx-auto mb-1" />
-                <p className="text-white text-xs">✓ Report sent to {email}</p>
               </div>
             )}
 
