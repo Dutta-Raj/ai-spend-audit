@@ -16,7 +16,7 @@
 ## 📸 Screenshots
 
 ### 1. Main Dashboard - Input Form
-![Main Dashboard](./screenshot1.png)
+![Main Dashboard](https://github.com/Dutta-Raj/ai-spend-audit/blob/main/Screenshot%202026-05-13%20161246.png)
 *Users enter company information and their AI tool stack details.*
 
 ### 2. Audit Results - Savings Display
