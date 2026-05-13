@@ -1,7 +1,6 @@
-import { notFound } from "next/navigation";
-import { Sparkles } from "lucide-react";
+﻿import { Sparkles } from "lucide-react";
 
-export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+export async function generateMetadata({ params }) {
   const { id } = await params;
   return {
     title: "AI Spend Audit - Savings Report",
@@ -9,7 +8,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   };
 }
 
-export default async function SharedAuditPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function SharedAuditPage({ params }) {
   const { id } = await params;
   
   const totalSavings = 89;

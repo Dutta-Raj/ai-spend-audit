@@ -161,7 +161,7 @@ export default function Home() {
   };
 
   const handleShare = async () => {
-    const url = `${window.location.origin}/audit/${shareId}`;
+    const url = `${window.location.origin}/share-view?id=${shareId}`;
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
@@ -462,7 +462,7 @@ export default function Home() {
               <div className="bg-emerald-500/20 rounded-lg p-3 text-center border border-emerald-500/30">
                 <p className="text-emerald-400 text-xs mb-1">✓ Shareable URL copied to clipboard!</p>
                 <p className="text-slate-300 text-xs break-all">
-                  {window.location.origin}/audit/{shareId}
+                  {window.location.origin}/share-view?id={shareId}
                 </p>
               </div>
             )}

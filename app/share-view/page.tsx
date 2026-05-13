@@ -1,35 +1,18 @@
-import { notFound } from "next/navigation";
-import { Sparkles } from "lucide-react";
+﻿import { Sparkles } from "lucide-react";
 
-export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  return {
-    title: "AI Spend Audit - Savings Report",
-    description: "View your AI spend audit results.",
-  };
-}
-
-export default async function SharedAuditPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+export default function ShareViewPage({
+  searchParams,
+}: {
+  searchParams: { id: string };
+}) {
+  const id = searchParams.id;
   
   const totalSavings = 89;
   const recommendations = [
-    {
-      toolName: "Cursor",
-      currentPlan: "Business",
-      recommendedPlan: "Pro",
-      monthlySavings: 40,
-      reason: "Cursor Business costs $40/user but Pro is $20/user.",
-      action: "Switch from Business to Pro"
-    },
-    {
-      toolName: "Claude",
-      currentPlan: "Team",
-      recommendedPlan: "Pro",
-      monthlySavings: 20,
-      reason: "Claude Team costs $30/user but Pro is $20/user.",
-      action: "Downgrade from Team to Pro"
-    }
+    { toolName: "Cursor", monthlySavings: 40, reason: "Cursor Business costs $40/user but Pro is $20/user.", action: "Switch from Business to Pro" },
+    { toolName: "Claude", monthlySavings: 20, reason: "Claude Team costs $30/user but Pro is $20/user.", action: "Downgrade from Team to Pro" },
+    { toolName: "GitHub Copilot", monthlySavings: 9, reason: "Business costs $19/month but Individual is $10/month.", action: "Switch to Individual" },
+    { toolName: "ChatGPT", monthlySavings: 20, reason: "Two Plus accounts cost less than Team plan.", action: "Switch to two Plus accounts" }
   ];
 
   return (
@@ -41,7 +24,7 @@ export default async function SharedAuditPage({ params }: { params: Promise<{ id
             <span className="text-sm text-emerald-400">Shared Audit Report</span>
           </div>
           <h1 className="text-3xl font-bold text-white">AI Spend Audit Results</h1>
-          <p className="text-slate-400 mt-2">Anonymous audit report</p>
+          <p className="text-slate-400 mt-2">Anonymous report {id ? `#${id.substring(0, 8)}` : ""}</p>
         </div>
         
         <div className="bg-gradient-to-r from-emerald-600 to-teal-700 rounded-2xl p-8 text-center mb-6">

@@ -1,17 +1,14 @@
-import { notFound } from "next/navigation";
+﻿"use client";
+
+import { useSearchParams } from "next/navigation";
 import { Sparkles } from "lucide-react";
+import { Suspense } from "react";
 
-export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  return {
-    title: "AI Spend Audit - Savings Report",
-    description: "View your AI spend audit results.",
-  };
-}
-
-export default async function SharedAuditPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+function ShareContent() {
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
   
+  // Mock data for demonstration
   const totalSavings = 89;
   const recommendations = [
     {
@@ -29,6 +26,22 @@ export default async function SharedAuditPage({ params }: { params: Promise<{ id
       monthlySavings: 20,
       reason: "Claude Team costs $30/user but Pro is $20/user.",
       action: "Downgrade from Team to Pro"
+    },
+    {
+      toolName: "GitHub Copilot",
+      currentPlan: "Business",
+      recommendedPlan: "Individual",
+      monthlySavings: 9,
+      reason: "Business costs $19/month but Individual is $10/month.",
+      action: "Switch from Business to Individual"
+    },
+    {
+      toolName: "ChatGPT",
+      currentPlan: "Team",
+      recommendedPlan: "Plus",
+      monthlySavings: 20,
+      reason: "Two Plus accounts cost less than Team plan.",
+      action: "Switch from Team to two Plus accounts"
     }
   ];
 
@@ -41,7 +54,7 @@ export default async function SharedAuditPage({ params }: { params: Promise<{ id
             <span className="text-sm text-emerald-400">Shared Audit Report</span>
           </div>
           <h1 className="text-3xl font-bold text-white">AI Spend Audit Results</h1>
-          <p className="text-slate-400 mt-2">Anonymous audit report</p>
+          <p className="text-slate-400 mt-2">Anonymous audit report {id ? `#${id}` : ""}</p>
         </div>
         
         <div className="bg-gradient-to-r from-emerald-600 to-teal-700 rounded-2xl p-8 text-center mb-6">
@@ -71,5 +84,13 @@ export default async function SharedAuditPage({ params }: { params: Promise<{ id
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SharePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-slate-900 flex items-center justify-center"><p className="text-white">Loading...</p></div>}>
+      <ShareContent />
+    </Suspense>
   );
 }
