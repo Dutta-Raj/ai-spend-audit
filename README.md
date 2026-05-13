@@ -20,7 +20,7 @@
 *Users enter company information and their AI tool stack details.*
 
 ### 2. Audit Results - Savings Display
-![Audit Results](./screenshot2.png)
+![Audit Results](https://github.com/Dutta-Raj/ai-spend-audit/blob/main/Screenshot%202026-05-13%20161336.png)
 *Audit results showing monthly savings ($140/month), annual savings ($1,680/year), and detailed recommendations.*
 
 ### 3. Shareable Public Report
