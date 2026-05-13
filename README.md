@@ -24,7 +24,7 @@
 *Audit results showing monthly savings ($140/month), annual savings ($1,680/year), and detailed recommendations.*
 
 ### 3. Shareable Public Report
-![Shareable Report](./screenshot3.png)
+![Shareable Report](https://github.com/Dutta-Raj/ai-spend-audit/blob/main/Screenshot%202026-05-13%20161356.png)
 *Anonymous shareable report - no personal information exposed, only savings and recommendations.*
 
 ---
