@@ -161,7 +161,24 @@ export default function Home() {
   };
 
   const handleShare = async () => {
-    const url = `${window.location.origin}/share-view?id=${shareId}`;
+    // Create audit data object with actual results
+    const auditData = {
+      savings: totalSavings,
+      annualSavings: annualSavings,
+      recommendations: recommendations.map(r => ({
+        toolName: r.toolName,
+        monthlySavings: r.monthlySavings,
+        reason: r.reason,
+        action: r.action,
+        currentPlan: r.currentPlan,
+        recommendedPlan: r.recommendedPlan
+      }))
+    };
+    
+    // Encode and create URL with data
+    const encodedData = encodeURIComponent(JSON.stringify(auditData));
+    const url = `${window.location.origin}/share-view?data=${encodedData}`;
+    
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
@@ -172,7 +189,7 @@ export default function Home() {
       }, 5000);
     } catch (err) {
       console.error("Failed to copy:", err);
-      alert(`Copy this URL to share:\n\n${url}`);
+      alert("Copy this URL to share: " + url);
     }
   };
 
@@ -462,7 +479,7 @@ export default function Home() {
               <div className="bg-emerald-500/20 rounded-lg p-3 text-center border border-emerald-500/30">
                 <p className="text-emerald-400 text-xs mb-1">✓ Shareable URL copied to clipboard!</p>
                 <p className="text-slate-300 text-xs break-all">
-                  {window.location.origin}/share-view?id={shareId}
+                  {window.location.origin}/share-view?data={encodeURIComponent(JSON.stringify({ savings: totalSavings, annualSavings: annualSavings, recommendations: recommendations.map(r => ({ toolName: r.toolName, monthlySavings: r.monthlySavings, reason: r.reason, action: r.action })) }))}
                 </p>
               </div>
             )}
